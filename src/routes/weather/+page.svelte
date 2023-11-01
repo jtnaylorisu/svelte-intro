@@ -2,8 +2,10 @@
 	import type { PageData, ActionData } from './$types';
 	import { Card } from 'flowbite-svelte';
 	import { enhance } from '$app/forms';
+	import States from '../states/States.svelte';
+    import Cities from '../cities/Cities.svelte';    
 
-	export let data: PageData;	
+	export let data: PageData;		
 	
 	function parseTime(time : string) {
 		var date = new Date(time);
@@ -15,6 +17,16 @@
 		var strminutes = minutes < 10 ? '0'+minutes : minutes;
 		var strTime = hours + ':' + strminutes + ' ' + ampm;
 		return strTime;
+	}	
+	
+	document.addEventListener("stateChange", (event) => {
+		console.log("FARTBUTT")
+		console.log(event)
+	});
+
+	function handleStateChange(event: Event) {
+		console.log("CACAW!")
+		console.log(event);
 	}
 
 	$: forecast = data.forecast;
@@ -78,6 +90,9 @@
 		<input name="longitude" id="longitude" type="text" />
 		<button data-key="enter" formaction="?/enter">enter</button>		
 	</div>
+	<div id="control-container">
+		<States on:stateChange />
+	</div>	
 </form>
 
 <style>

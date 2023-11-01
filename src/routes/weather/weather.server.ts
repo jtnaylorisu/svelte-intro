@@ -29,7 +29,7 @@ export class Weather {
         var forecast = await fetch(this.forecastUrl)
             .then(response => response.json())
             .then(response => {             
-                return response as Forecast;                   
+                return response as Forecast;
             });              
             
         return forecast;
