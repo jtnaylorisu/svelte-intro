@@ -16,17 +16,21 @@ export const actions = {
 	/**
 	 * Calls the weather service for updated values
 	 */
-	enter: async ({ request, cookies }) => {
-		const data = await request.formData();
-		
-		var latitude: number = +data!.get("latitude")!;
-		var longitude: number = +data!.get("longitude")!;				
+	enter: async ({ request, cookies }) => {				
+		const data = await request.formData();		
 
-		const weather = new Weather();		
-		var forecast = await weather.getForecast(latitude, longitude);							
+		var state: string = data!.get("stateSelector")!.toString();
+		var city: string = data!.get("citySelector")!.toString();
 
-		if(forecast != null) {
-			cookies.set('forecast', JSON.stringify(forecast));
-		}
+		const weather = new Weather();
+		var cityResult = await weather.getCity(state, city);
+				
+		if(cityResult) {
+			var forecast = await weather.getForecast(cityResult.latitude, cityResult.longitude);							
+
+			if(forecast != null) {
+				cookies.set('forecast', JSON.stringify(forecast));
+			}
+		}		
 	}	
 } satisfies Actions;

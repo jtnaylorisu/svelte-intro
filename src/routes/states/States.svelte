@@ -9,10 +9,9 @@
 	onMount(async () => {
 		await getStateData();
 	});	
-
-	let ref: any;	
-
 	
+	const dispatch = createEventDispatcher<{stateChange: { selectedState: string }}>();
+	let selectedState: string = '';
 
 	async function getStateData() {		        
         stateData = await fetch(statesUrl, {
@@ -24,16 +23,16 @@
             .then(response => {   							
                 return response as StateData;
             });     					
-	}	
+	}
 
-	const dispatchEvent = (event: Event) => {		
-		const customEvent = new CustomEvent('stateChange', { detail: { content: event }, bubbles: true });
-		ref.dispatchEvent(customEvent);
+	function dispatchEvent() {				
+		dispatch('stateChange', { selectedState });
 	}
 </script>
 
 {#if stateData}
-	<Select id="stateSelector" name="stateSelector" bind:this={ref} on:change={ (event) => dispatchEvent(event) }>
+	<label for="stateSelector">State</label>
+	<Select id="stateSelector" name="stateSelector" bind:value={selectedState} on:change={ () => dispatchEvent() }>
 		{#each stateData.data.states as state}
 			<option value={state.name}>{state.name}</option>
 		{/each}

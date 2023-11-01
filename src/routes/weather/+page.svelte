@@ -1,11 +1,14 @@
 <script lang="ts">		
 	import type { PageData, ActionData } from './$types';
-	import { Card } from 'flowbite-svelte';
+	import { Button, Card } from 'flowbite-svelte';
 	import { enhance } from '$app/forms';
 	import States from '../states/States.svelte';
     import Cities from '../cities/Cities.svelte';    
+    import type { Input } from 'postcss';
 
-	export let data: PageData;		
+	export let data: PageData;			
+	let selectedState: string = "";
+	let onLoading = false;
 	
 	function parseTime(time : string) {
 		var date = new Date(time);
@@ -17,17 +20,11 @@
 		var strminutes = minutes < 10 ? '0'+minutes : minutes;
 		var strTime = hours + ':' + strminutes + ' ' + ampm;
 		return strTime;
-	}	
-	
-	document.addEventListener("stateChange", (event) => {
-		console.log("FARTBUTT")
-		console.log(event)
-	});
+	}			
 
-	function handleStateChange(event: Event) {
-		console.log("CACAW!")
-		console.log(event);
-	}
+	export const handleStateChange = (e: CustomEvent) => {
+		selectedState = e.detail["selectedState"];
+	}	
 
 	$: forecast = data.forecast;
 </script>
@@ -49,7 +46,7 @@
 	</h2>	
 </section>
 
-<div class="grid">
+<div class="grid">	
 	{#if forecast }
 		<div class="header-container">
 			<h2>Weather Forecast for {forecast.forecastDate} - Timezone: {forecast.timezone} - {forecast.timezone_abbreviation}</h2>
@@ -75,7 +72,7 @@
 
 <form
 	method="POST"
-	action="?/enter"
+	action="?/enter"		
 	use:enhance={() => {
 		// prevent default callback from resetting the form
 		return ({ update }) => {
@@ -83,16 +80,17 @@
 		};
 	}}>		
 
-	<div class="controls">
-		<label for="latitude">Latitude</label>
-		<input name="latitude" id="latitude" type="text" />
-		<label for="longitude">Longitude</label>
-		<input name="longitude" id="longitude" type="text" />
-		<button data-key="enter" formaction="?/enter">enter</button>		
-	</div>
 	<div id="control-container">
-		<States on:stateChange />
+		<div class="control">
+			<States on:stateChange={handleStateChange} />
+		</div>		
+		{#if selectedState && selectedState !== ""}
+			<div class="control">
+				<Cities state = {selectedState} />
+			</div>			
+		{/if}
 	</div>	
+	<button on:click={() => onLoading == true} data-key="enter" formaction="?/enter">Submit</button>		
 </form>
 
 <style>
